@@ -1,0 +1,20 @@
+<launch>
+
+    <node
+      name="velocity_publisher"
+      pkg="uav_nav_ops"
+      type="velocity_publisher.py"
+      output="screen"
+      launch-prefix ="xterm -e">
+    </node>
+
+    
+    <node
+      name="state_display"
+      pkg="uav_nav_ops"
+      type="state_display.py"
+      output="screen"
+      launch-prefix ="xterm -e">
+    </node>
+
+</launch>
