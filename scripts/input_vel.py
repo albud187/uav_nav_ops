@@ -35,6 +35,8 @@ def handle_pose(msg):
 
 #functions
 
+#calculates the rotation matrix from the world frame to the object's body frame
+#input pose is the drone's pose directly from PoseStampted topic
 def ROT_mat(input_pose):
     orientation_quat = (input_pose.pose.orientation.x, input_pose.pose.orientation.y, input_pose.pose.orientation.z, input_pose.pose.orientation.w)
     rx, ry, rz = euler_from_quaternion(orientation_quat)
@@ -54,6 +56,8 @@ def ROT_mat(input_pose):
                        [R31, R32, R33]])
     return result
 
+#converts a velocity command expressed in the body frame to a velocity command in the drone world frame
+#input pose is the drone's pose directly from PoseStampted topic
 def body_to_world_vel(bvel, input_pose):
     result_vel = Twist()
     v_linear = np.array([[bvel.linear.x],
@@ -98,8 +102,8 @@ orbit_radius = 0.3
 #positve y = right
 x_vel = -0.2
 y_vel = 0
-#bvel = orbit_vel(orbit_radius)
-bvel = xy_mov(x_vel, y_vel)
+bvel = orbit_vel(orbit_radius)
+#bvel = xy_mov(x_vel, y_vel)
 
 #main loop
 def main_node():

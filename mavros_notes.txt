@@ -1,13 +1,15 @@
 drone RF test procedure
 #drone IP always changes
-ssh root@192.168.82.96
+ssh root@192.168.82.85
 oelinux123
-scp -r uav_nav_ops root@192.168.82.96:/home/mavros_test/catkin_ws/src
+scp -r uav_nav_ops root@192.168.82.85:/home/mavros_test/catkin_ws/src
 
 cd /home/mavros_test/catkin_ws/src/uav_nav_ops/scripts
 python position_publisher.py
 python velocity_publisher.py
+
 roslaunch mavros px4.launch fcu_url:=udp://127.0.0.1:14551@:14551 tgt_system:=${PX4_SYS_ID}
+roslaunch voxl_mpa_to_ros voxl_mpa_to_ros.launch
 
 voxl-configure-mavlink-server
 voxl-configure-vision-px4
