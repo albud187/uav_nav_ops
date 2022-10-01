@@ -1,6 +1,6 @@
 drone RF test procedure
 #drone IP always changes
-ssh root@192.168.82.85
+ssh root@192.168.82.57
 oelinux123
 scp -r uav_nav_ops root@192.168.82.85:/home/mavros_test/catkin_ws/src
 
@@ -18,8 +18,8 @@ sudo rm -r dirname
 sudo rm -r uav_nav_ops
 
 rostopic echo /mavros/local_position/pose
-rostopic echo /mavros/local_position/velocity_body (left)
-rostopic echo /mavros/local_position/velocity_local (right)
+rostopic echo /mavros/local_position/velocity_body 
+rostopic echo /mavros/local_position/velocity_local
 rostopic echo /mavros/local_position/velocity_body_cov
 rostopic echo /mavros/setpoint_position/local
 
@@ -48,4 +48,6 @@ rostopic echo /mavros/setpoint_position/local
 
 https://docs.modalai.com/mavros-voxl-2/
 https://docs.modalai.com/setup-ros-on-voxl-2/
+
+roslaunch mavros px4.launch fcu_url:=udp://:14541@192.168.82.71:14557 tgt_system:=1
 

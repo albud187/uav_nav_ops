@@ -1,5 +1,3 @@
-#!/usr/bin/env python3
-
 #!/usr/bin/env python
 import roslib
 import sys
@@ -33,7 +31,7 @@ class image_converter:
     
     def __init__(self):
         #important inits
-        rospy.init_node('uav_camera_sim', anonymous=True)
+        rospy.init_node('apriltag_detector', anonymous=True)
         self.bridge = CvBridge()
 
         #subscribers
@@ -50,7 +48,7 @@ class image_converter:
             image = cv_image
             gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
             results = detector.detect(gray)
-            
+            print("test")
             for r in results:
               # extract the bounding box (x, y)-coordinates for the AprilTag
               # and convert each of the (x, y)-coordinate pairs to integers
@@ -84,6 +82,7 @@ class image_converter:
             cv2.imshow("Image window", cv_image)
             cv2.waitKey(3)
         except CvBridgeError as e:
+            print("test")
             pass
 
         except CvBridgeError as e:
