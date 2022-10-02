@@ -1,8 +1,8 @@
 drone RF test procedure
 #drone IP always changes
-ssh root@192.168.82.57
+ssh root@192.168.82.201
 oelinux123
-scp -r uav_nav_ops root@192.168.82.85:/home/mavros_test/catkin_ws/src
+scp -r uav_nav_ops root@192.168.82.201:/home/mavros_test/catkin_ws/src
 
 cd /home/mavros_test/catkin_ws/src/uav_nav_ops/scripts
 python position_publisher.py

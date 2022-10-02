@@ -4,7 +4,6 @@ import rospy
 from tf.transformations import euler_from_quaternion, quaternion_from_euler
 from tf.transformations import quaternion_conjugate as qc, quaternion_multiply as qm
 import time
-import image_geometry as ig
 import roslib
 import tf2_ros
 import socket
@@ -14,7 +13,6 @@ from geometry_msgs.msg import Pose2D, Vector3, Pose
 #subscribed topics
 T_TAG_POS = "uav/tag_pos"
 T_UAV_POSE = "/uav/pose"
-T_UAV_CAM_INFO = "/uav/down_cam/camera/camera_info"
 #published topics
 
 CAMERA_MAT = np.array([[2.8054458697503384*10**2, 0, 3.4675256521746036*10**2],
@@ -29,7 +27,6 @@ WP_DIST_TH = 1
 #globals
 tag_pos = Vector3()
 uav_pose = Pose()
-uav_pcm = ig.PinholeCameraModel()
 all_waypoints =[]
 
 #functions
@@ -113,7 +110,7 @@ def calc_tag_pos_world(transform, tag_pos):
     f = FOCAL_LEN
     ROT_world_cam = ROT_mat(rx, ry, rz)
     uv = uv_cam(px, py, cx, cy, f)
-    uv_world = ROT_world_cam @ uv
+    uv_world = np.matmul(ROT_world_cam, uv)
     k_z0 = -tz/uv_world[2]
   
     tag_position = (tx + float(k_z0*uv_world[0]), ty + float(k_z0*uv_world[1]))
@@ -143,23 +140,16 @@ f.close()
 def main_loop():
     #init
     global tag_pos
-    global uav_pcm
     global all_waypoints
-    rospy.init_node("uav_waypoint_img_calculator", anonymous = False)
-    tf_listener = tf.TransformListener()
-    rate = rospy.Rate(20)
-    
-    tf_buffer = tf2_ros.Buffer()
-    tf2_listener = tf2_ros.TransformListener(tf_buffer)
-
-
+    global uav_pose
+    rospy.init_node("apriltag_xform", anonymous = False)
+  
     
     #f.write("test")
     
     #subscribers
     rospy.Subscriber(T_UAV_POSE, Pose, handle_uav_pose)
     rospy.Subscriber(T_TAG_POS, Vector3, handle_tag_pos)
-    rospy.Subscriber(T_UAV_CAM_INFO, CameraInfo, handle_pcm)
     #publishers
     
     while not rospy.is_shutdown():
@@ -168,15 +158,23 @@ def main_loop():
         #xform = tf_buffer.lookup_transform(WORLD_FRAME, UAV_CAMERA_FRAME, rospy.Time(0), rospy.Duration(10))
         if tag_pos.x != 0:
             try:
-                xform = find_xform(tf_buffer, WORLD_FRAME, UAV_CAMERA_FRAME)
-                tag_xy = calc_tag_pos_world(xform, tag_pos)
-                if new_wp_check(all_waypoints, tag_xy, WP_DIST_TH) == True:
-                    all_waypoints.append(tag_xy)
-                    f = open("wp-list_master.txt", "a")
-                    f.write(str(tag_xy[0])+","+str(tag_xy[1])+","+"\n")
-                    f.close()
-                    print("writing")
-                    print(all_waypoints)
+                #Rw_d = ROT_mat(uav_pose.orientation.x, uav_pose.orientation.y, uav_pose.orientation.z)
+                Rw_d = ROT_mat(0,0,0)
+                Rd_cl = ROT_mat(0,45*np.pi/180,0)
+                Rcl_cf = ROT_mat(-90*np.pi/180,0,-90*np.pi/180)
+                uv = uv_cam(tag_pos.x, tag_pos.y, CAMERA_CENTER_X, CAMERA_CENTER_Y, FOCAL_LEN)
+                vect = np.matmul(np.matmul(np.matmul(Rw_d, Rd_cl), Rcl_cf), uv)
+                print(vect)
+                print("")
+                # xform = find_xform(tf_buffer, WORLD_FRAME, UAV_CAMERA_FRAME)
+                # tag_xy = calc_tag_pos_world(xform, tag_pos)
+                # if new_wp_check(all_waypoints, tag_xy, WP_DIST_TH) == True:
+                #     all_waypoints.append(tag_xy)
+                #     f = open("wp-list_master.txt", "a")
+                #     f.write(str(tag_xy[0])+","+str(tag_xy[1])+","+"\n")
+                #     f.close()
+                #     print("writing")
+                #     print(all_waypoints)
             except:
                 pass
     

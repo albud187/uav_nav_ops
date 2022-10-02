@@ -79,8 +79,8 @@ class image_converter:
             print(tag_pos)
             print(" ")
 
-            cv2.imshow("Image window", cv_image)
-            cv2.waitKey(3)
+            #cv2.imshow("Image window", cv_image)
+            #cv2.waitKey(3)
         except CvBridgeError as e:
             print("test")
             pass

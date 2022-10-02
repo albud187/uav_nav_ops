@@ -16,7 +16,7 @@ T_MOCAP_pose = "/uav/pose"
 
 #global variables
 MOCAP_pose = Pose()
-MOCAP_pose = Pose()
+
 
 #functions
 def handle_pose_data(data):
