@@ -71,7 +71,8 @@ def HT_mat(tx, ty, tz, rx, ry, rz):
                        [R21, R22, R23, ty],
                        [R31, R32, R33, tz]
                        [0,0,0,1]])
-
+    return result
+    
 def uv_cam(px, py, cx, cy, f):
     vx = px - cx
     vy = py - cy
@@ -84,35 +85,12 @@ def uv_cam(px, py, cx, cy, f):
                                     [vz]])
     return result
 
-def find_xform(tf_buffer, frame1, frame2):
-    xform = tf_buffer.lookup_transform(frame1, frame2, rospy.Time(0), rospy.Duration(10))
-    tx = xform.transform.translation.x
-    ty = xform.transform.translation.y
-    tz = xform.transform.translation.z
+def tag_pos_world(camera_pos, uv_world):
+    tx = float(camera_pos[0])
+    ty = float(camera_pos[1])
+    tz = float(camera_pos[2])
 
-    orientation_quat = (xform.transform.rotation.x, xform.transform.rotation.y, xform.transform.rotation.z, xform.transform.rotation.w )
-    rx, ry, rz = euler_from_quaternion(orientation_quat)
-    result = (tx,ty,tz,rx,ry,rz)
-
-    return(result)
-
-def calc_tag_pos_world(transform, tag_pos):
-    tx = transform[0]
-    ty = transform[1]
-    tz = transform[2]
-    rx = transform[3]
-    ry = transform[4]
-    rz = transform[5]
-    px = tag_pos.x
-    py = tag_pos.y
-    cx = CAMERA_CENTER_X
-    cy = CAMERA_CENTER_Y
-    f = FOCAL_LEN
-    ROT_world_cam = ROT_mat(rx, ry, rz)
-    uv = uv_cam(px, py, cx, cy, f)
-    uv_world = np.matmul(ROT_world_cam, uv)
     k_z0 = -tz/uv_world[2]
-  
     tag_position = (tx + float(k_z0*uv_world[0]), ty + float(k_z0*uv_world[1]))
     return tag_position
 
@@ -163,8 +141,22 @@ def main_loop():
                 Rd_cl = ROT_mat(0,45*np.pi/180,0)
                 Rcl_cf = ROT_mat(-90*np.pi/180,0,-90*np.pi/180)
                 uv = uv_cam(tag_pos.x, tag_pos.y, CAMERA_CENTER_X, CAMERA_CENTER_Y, FOCAL_LEN)
-                vect = np.matmul(np.matmul(np.matmul(Rw_d, Rd_cl), Rcl_cf), uv)
-                print(vect)
+                uv_world = np.matmul(np.matmul(np.matmul(Rw_d, Rd_cl), Rcl_cf), uv)
+
+                uav_pos_H = np.array([[uav_pose.position.x],
+                                          [uav_pose.position.y],
+                                          [uav_pose.position.z],
+                                          [1]])
+                Hd_c = HT_mat(0.3, 0, -0.1, 0, 45*np.pi/180, 0)
+
+                cam_pos_H = np.matmul(Hd_c, uav_pos_H)
+                tag_xy = tag_pos_world(cam_pos_H, uv_world)
+                print("uv_world")
+                print(uv_world)
+                print(" ")
+                print("tag_xy")
+                print(tag_xy)
+                print()
                 print("")
                 # xform = find_xform(tf_buffer, WORLD_FRAME, UAV_CAMERA_FRAME)
                 # tag_xy = calc_tag_pos_world(xform, tag_pos)

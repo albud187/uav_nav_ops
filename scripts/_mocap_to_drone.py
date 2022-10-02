@@ -40,8 +40,8 @@ def parse_data(msg_data, RB5_key):
     return(result)
 
 
-#host = raw_input("enter IP address: ")
-host = "192.168.82.194"
+host = raw_input("enter IP address: ")
+#host = "192.168.82.194"
 port = 1236
 ThreadCount = 0
 
