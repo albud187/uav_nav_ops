@@ -1,0 +1,11 @@
+roslaunch voxl_mpa_to_ros voxl_mpa_to_ros.launch
+python apriltag_detector.py
+python apriltag_xform.py
+
+expected behaviour:
+tag_pos.x increases -->object moves right --> uv_world.y decreases
+tag_pos.x decreases -->object moves left --> uv_world.y increases
+tag_pos.y increases --> object moves closer --> uv_world.x decreases
+tag_pos.y decreases --> object moves closer --> uv_world.x increases
+
+ rostopic pub -r 100 /uav/tag_pos geometry_msgs/Vector3 '{x: 400, y: 204, z: 0}'

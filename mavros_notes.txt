@@ -1,0 +1,57 @@
+drone RF test procedure
+#drone IP always changes
+ssh root@192.168.82.10
+oelinux123
+scp -r uav_nav_ops root@192.168.82.122:/home/mavros_test/catkin_ws/src
+scp -r scripts root@192.168.82.45:/home/mavros_test/catkin_ws/src/uav_nav_ops
+
+scp apriltag_xform.py root@192.168.82.17:/home/mavros_test/catkin_ws/src/uav_nav_ops/scripts
+
+scp opencv_tracking_intrinsics.yml uoroswork@192.168.82.194:/home/uoroswork
+cd /home/mavros_test/catkin_ws/src/uav_nav_ops/scripts
+python position_publisher.py
+python velocity_publisher.py
+
+roslaunch mavros px4.launch fcu_url:=udp://127.0.0.1:14551@:14551 tgt_system:=${PX4_SYS_ID}
+roslaunch voxl_mpa_to_ros voxl_mpa_to_ros.launch
+roslaunch uav_nav_ops RB5_drone.launch
+voxl-configure-mavlink-server
+voxl-configure-vision-px4
+
+sudo rm -r dirname
+sudo rm -r scripts
+
+rostopic echo /mavros/local_position/pose
+rostopic echo /mavros/local_position/velocity_body 
+rostopic echo /mavros/local_position/velocity_local
+rostopic echo /mavros/local_position/velocity_body_cov
+rostopic echo /mavros/setpoint_position/local
+
+/mavros/geofence/waypoints
+
+/mavros/local_position/accel
+/mavros/local_position/odom
+/mavros/local_position/pose
+/mavros/local_position/pose_cov
+/mavros/local_position/velocity_body
+/mavros/local_position/velocity_body_cov
+/mavros/local_position/velocity_local
+
+/mavros/setpoint_position/global_to_local
+/mavros/setpoint_position/local
+/mavros/setpoint_raw/attitude
+/mavros/setpoint_raw/global
+/mavros/setpoint_raw/local
+/mavros/setpoint_raw/target_attitude
+/mavros/setpoint_raw/target_global
+/mavros/setpoint_raw/target_local
+/mavros/setpoint_trajectory/desired
+/mavros/setpoint_trajectory/local
+/mavros/setpoint_velocity/cmd_vel
+/mavros/setpoint_velocity/cmd_vel_unstamped
+
+https://docs.modalai.com/mavros-voxl-2/
+https://docs.modalai.com/setup-ros-on-voxl-2/
+
+
+https://pyimagesearch.com/2015/06/22/install-opencv-3-0-and-python-2-7-on-ubuntu/

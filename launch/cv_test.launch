@@ -1,0 +1,16 @@
+<launch>
+
+    <node
+      name="apriltag_detector"
+      pkg="uav_nav_ops"
+      type="apriltag_detector.py">
+    </node>
+
+    <node
+      name="apriltag_xform"
+      pkg="uav_nav_ops"
+      type="apriltag_xform.py"
+      output="screen">
+    </node>
+
+</launch>
