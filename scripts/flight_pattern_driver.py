@@ -21,6 +21,7 @@ T_set_pos = "/mavros/setpoint_position/local"
 PATTERN_PARAMS = PoseStamped()
 UAV_POSE = PoseStamped()
 SET_POSE = PoseStamped()
+ZERO_POSE = PoseStamped()
 #constants
 
 
@@ -118,7 +119,7 @@ def handle_pose(msg):
 def handle_params(msg):
     global PATTERN_PARAMS
     PATTERN_PARAMS = msg
-prev_param = PoseStamped()
+
 
 prev_param_seq = 0
 def check_update_param(pattern_param):
@@ -147,40 +148,45 @@ def main_node():
     #publishers/mavros/local_position/pose
     SET_POSE_pub = rospy.Publisher(T_set_pos, PoseStamped, queue_size =10)
     wp_idx = 0
+    SET_POSE = ZERO_POSE
     while not rospy.is_shutdown():
-        try:
-            if PATTERN_PARAMS.pose.orientation.w != 0:
-                waypoints = box_waypoints(PATTERN_PARAMS)
-                current_waypoint_w0 = waypoints[wp_idx]
-                current_waypoint_dw_raw = convert_pos(xform, current_waypoint_w0)
-                current_waypoint_pose = calculate_set_pose(current_waypoint_dw_raw, UAV_POSE)
-                SET_POSE = current_waypoint_pose
-                
-                distance = calculate_distance(current_waypoint_pose, UAV_POSE)
-                
-                print(" ")
-                if distance < 0.2 and wp_idx < len(waypoints):
-                    wp_idx = wp_idx + 1
-                else:
+        
+        if check_update_param(PATTERN_PARAMS):
+            
+            while PATTERN_PARAMS.pose.orientation.w != 0:
+                try:
+                    waypoints = box_waypoints(PATTERN_PARAMS)
+                    current_waypoint_w0 = waypoints[wp_idx]
+                    current_waypoint_dw_raw = convert_pos(xform, current_waypoint_w0)
+                    current_waypoint_pose = calculate_set_pose(current_waypoint_dw_raw, UAV_POSE)
+                    SET_POSE = current_waypoint_pose
+                    SET_POSE_pub.publish(SET_POSE)
+                    distance = calculate_distance(current_waypoint_pose, UAV_POSE)
+                    print(wp_idx)
+                    print("x: "+str(SET_POSE.pose.position.x))
+                    print("y: "+str(SET_POSE.pose.position.y))
+                    print("z: "+str(SET_POSE.pose.position.z))
+                    print("d: "+str(distance))
+                    print(" ")
+                    
+                    if distance < 0.2:
+                        wp_idx = wp_idx + 1
+                except:
                     wp_idx = 0
+                
+                time.sleep(0.3)
             else:
                 SET_POSE=UAV_POSE
                 print("holding")
-        except:
-            SET_POSE=UAV_POSE
+        else:
+            SET_POSE = UAV_POSE
             print("holding")
+        
         
         SET_POSE_pub.publish(SET_POSE)
         #print(PATTERN_PARAMS.header.seq)
-        if check_update_param(PATTERN_PARAMS):
-            print("x: "+str(SET_POSE.pose.position.x))
-            print("y: "+str(SET_POSE.pose.position.y))
-            print("z: "+str(SET_POSE.pose.position.z))
-            try:
-                print("d: "+str(distance))
-            except:
-                pass
-        time.sleep(0.25)
+        
+        
     rospy.spin()
 
 
