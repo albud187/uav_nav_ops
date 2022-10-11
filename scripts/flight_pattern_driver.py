@@ -25,10 +25,10 @@ ZERO_POSE = PoseStamped()
 #constants
 
 
-# FILEPATH = "/home/mavros_test/catkin_ws/src/uav_nav_ops/scripts"
-# FILENAME = "mocap_to_drone_world.txt"
-# XFORM_FILE = os.path.join(FILEPATH, FILENAME)
-XFORM_FILE = "mocap_to_drone_world.txt"
+FILEPATH = "/home/mavros_test/catkin_ws/src/uav_nav_ops/scripts"
+FILENAME = "mocap_to_drone_world.txt"
+XFORM_FILE = os.path.join(FILEPATH, FILENAME)
+
 
 
 #functions
@@ -169,23 +169,18 @@ def main_node():
                     print("d: "+str(distance))
                     print(" ")
                     
-                    if distance < 0.2:
+                    if distance < 0.1:
                         wp_idx = wp_idx + 1
                 except:
                     wp_idx = 0
                 
-                time.sleep(0.3)
             else:
                 SET_POSE=UAV_POSE
                 print("holding")
-        else:
-            SET_POSE = UAV_POSE
-            print("holding")
         
         
         SET_POSE_pub.publish(SET_POSE)
         #print(PATTERN_PARAMS.header.seq)
-        
         
     rospy.spin()
 

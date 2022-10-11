@@ -21,9 +21,7 @@ UAV_POSE = PoseStamped()
 PATTERN_PARAMS = PoseStamped()
 HOLD_POS_PARAM = PoseStamped()
 HOLD_POS_PARAM.pose.orientation.w = 0
-FILEPATH = "/home/mavros_test/catkin_ws/src/uav_nav_ops/scripts"
-FILENAME = "mocap_to_drone_world.txt"
-XFORM_FILE = os.path.join(FILEPATH, FILENAME)
+
 
 #callbacks
 def subpub_PATTERN_PARAMS(msg):
@@ -34,14 +32,6 @@ def subpub_PATTERN_PARAMS(msg):
     rate.sleep()
 
 #functions
-
-def read_transform(path):
-    f = open(path, "r")
-    lines = f.readlines()
-    #result = (float(lines[0]), float(lines[1]), float(lines[2]), float(lines[3]), float(lines[4]), float(lines[5]))
-    result = (float(lines[0]), float(lines[1]), float(lines[2]), 0, 0, float(lines[5]))
-
-    return result
 
 def to_params(pattern_input):
     

@@ -1,11 +1,11 @@
 drone RF test procedure
 #drone IP always changes
-ssh root@192.168.82.10
+ssh root@192.168.23.91
 oelinux123
 scp -r uav_nav_ops root@192.168.82.122:/home/mavros_test/catkin_ws/src
-scp -r scripts root@192.168.82.45:/home/mavros_test/catkin_ws/src/uav_nav_ops
+scp -r scripts root@192.168.23.45:/home/mavros_test/catkin_ws/src/uav_nav_ops
 
-scp apriltag_xform.py root@192.168.82.17:/home/mavros_test/catkin_ws/src/uav_nav_ops/scripts
+scp flight_pattern_driver.py root@192.168.23.83:/home/mavros_test/catkin_ws/src/uav_nav_ops/scripts
 
 scp opencv_tracking_intrinsics.yml uoroswork@192.168.82.194:/home/uoroswork
 cd /home/mavros_test/catkin_ws/src/uav_nav_ops/scripts
